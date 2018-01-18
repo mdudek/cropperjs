@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="x-ua-compatible" content="ie=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <title>Cropper.js</title>
+  <link rel="stylesheet" href="../dist/cropper.css">
+  <style>
+    .container {
+      margin: 20px auto;
+    }
+
+    img {
+      max-width: 100px;
+    }
+
+    .row,
+    .preview {
+      overflow: hidden;
+    }
+
+    .preview {
+      width: 900px;
+      height: 900px;
+      border: 1px dotted #646464;
+    }
+
+    .col {
+      float: left;
+    }
+
+    .col-6 {
+      width: 50%;
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Upscale vector image by Cropper</h1>
+    <div class="row">
+      <div class="col col-6">
+        <img id="image" src="../docs/images/vector.svg" alt="Picture">
+      </div>
+      <div class="col col-6">
+        <div class="preview"></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../dist/cropper.js"></script>
+  <script>
+    function updatePreview(cropper) {
+      var preview = document.querySelector('.preview');
+      var croppedCanvas = cropper.getCroppedCanvas({
+        sourceIsVector: true,
+        width: preview.offsetWidth,
+        height: preview.offsetHeight
+      });
+      while (preview.firstChild) {
+        preview.removeChild(preview.firstChild);
+      }
+      preview.appendChild(croppedCanvas);
+    }
+
+    window.addEventListener('DOMContentLoaded', function () {
+      var image = document.querySelector('#image');
+      var cropper = new Cropper(image, {
+          ready:function (e) {
+            updatePreview(cropper);
+          },
+          crop: function (e) {
+            updatePreview(cropper);
+          }
+        });
+    });
+  </script>
+</body>
+</html>

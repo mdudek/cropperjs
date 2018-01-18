@@ -651,19 +651,37 @@ export default {
     }
 
     const { canvasData } = this;
-    const source = getSourceCanvas(this.image, this.imageData, canvasData, options);
+    const source = getSourceCanvas(
+      this.image,
+      this.imageData,
+      this.cropBoxData,
+      canvasData,
+      options,
+    );
 
     // Returns the source canvas if it is not cropped.
     if (!this.cropped) {
       return source;
     }
 
-    const {
+    let {
       x,
       y,
       width: initialWidth,
       height: initialHeight,
     } = this.getData();
+
+    const isVectorSource = true;
+    if (isVectorSource) {
+      // upscale data for best render quality of vector image
+      const ratio = (canvasData.width / options.width) /
+        (this.image.naturalWidth / initialWidth);
+      x = Math.round(x / ratio);
+      y = Math.round(y / ratio);
+      initialWidth = Math.round(initialWidth / ratio);
+      initialHeight = Math.round(initialHeight / ratio);
+    }
+
     const aspectRatio = initialWidth / initialHeight;
     const maxSizes = getContainSizes({
       aspectRatio,

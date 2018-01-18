@@ -732,6 +732,7 @@ export function getRotatedSizes({ width, height, degree }) {
 export function getSourceCanvas(
   image,
   {
+    width: imageWidth,
     naturalWidth: imageNaturalWidth,
     naturalHeight: imageNaturalHeight,
     rotate = 0,
@@ -739,9 +740,13 @@ export function getSourceCanvas(
     scaleY = 1,
   },
   {
+    width: cropBoxWidth,
+  },
+  {
     aspectRatio,
     naturalWidth,
     naturalHeight,
+    width: canvasWidth,
   },
   {
     fillColor = 'transparent',
@@ -751,6 +756,8 @@ export function getSourceCanvas(
     maxHeight = Infinity,
     minWidth = 0,
     minHeight = 0,
+    width: targetWidth,
+    sourceIsVector,
   },
 ) {
   const canvas = document.createElement('canvas');
@@ -765,6 +772,18 @@ export function getSourceCanvas(
     width: minWidth,
     height: minHeight,
   });
+
+  if (sourceIsVector) {
+    const x = cropBoxWidth / (imageWidth / imageNaturalWidth);
+    // upscale data for best render quality of vector image
+    const ratio = (canvasWidth / targetWidth) /
+      (naturalWidth / x);
+    naturalWidth = Math.round(naturalWidth / ratio);
+    naturalHeight = Math.round(naturalHeight / ratio);
+    imageNaturalWidth = Math.round(imageNaturalWidth / ratio);
+    imageNaturalHeight = Math.round(imageNaturalHeight / ratio);
+  }
+
   const width = Math.min(maxSizes.width, Math.max(minSizes.width, naturalWidth));
   const height = Math.min(maxSizes.height, Math.max(minSizes.height, naturalHeight));
   const params = [

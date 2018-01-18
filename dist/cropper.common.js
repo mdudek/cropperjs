@@ -5,7 +5,7 @@
  * Copyright (c) 2015-2018 Chen Fengyuan
  * Released under the MIT license
  *
- * Date: 2018-01-03T13:27:18.062Z
+ * Date: 2018-01-18T14:22:04.062Z
  */
 
 'use strict';
@@ -1006,8 +1006,9 @@ function getRotatedSizes(_ref5) {
  * @param {Object} options - The options.
  * @returns {HTMLCanvasElement} The result canvas.
  */
-function getSourceCanvas(image, _ref6, _ref7, _ref8) {
-  var imageNaturalWidth = _ref6.naturalWidth,
+function getSourceCanvas(image, _ref6, _ref7, _ref8, _ref9) {
+  var imageWidth = _ref6.width,
+      imageNaturalWidth = _ref6.naturalWidth,
       imageNaturalHeight = _ref6.naturalHeight,
       _ref6$rotate = _ref6.rotate,
       rotate = _ref6$rotate === undefined ? 0 : _ref6$rotate,
@@ -1015,23 +1016,27 @@ function getSourceCanvas(image, _ref6, _ref7, _ref8) {
       scaleX = _ref6$scaleX === undefined ? 1 : _ref6$scaleX,
       _ref6$scaleY = _ref6.scaleY,
       scaleY = _ref6$scaleY === undefined ? 1 : _ref6$scaleY;
-  var aspectRatio = _ref7.aspectRatio,
-      naturalWidth = _ref7.naturalWidth,
-      naturalHeight = _ref7.naturalHeight;
-  var _ref8$fillColor = _ref8.fillColor,
-      fillColor = _ref8$fillColor === undefined ? 'transparent' : _ref8$fillColor,
-      _ref8$imageSmoothingE = _ref8.imageSmoothingEnabled,
-      imageSmoothingEnabled = _ref8$imageSmoothingE === undefined ? true : _ref8$imageSmoothingE,
-      _ref8$imageSmoothingQ = _ref8.imageSmoothingQuality,
-      imageSmoothingQuality = _ref8$imageSmoothingQ === undefined ? 'low' : _ref8$imageSmoothingQ,
-      _ref8$maxWidth = _ref8.maxWidth,
-      maxWidth = _ref8$maxWidth === undefined ? Infinity : _ref8$maxWidth,
-      _ref8$maxHeight = _ref8.maxHeight,
-      maxHeight = _ref8$maxHeight === undefined ? Infinity : _ref8$maxHeight,
-      _ref8$minWidth = _ref8.minWidth,
-      minWidth = _ref8$minWidth === undefined ? 0 : _ref8$minWidth,
-      _ref8$minHeight = _ref8.minHeight,
-      minHeight = _ref8$minHeight === undefined ? 0 : _ref8$minHeight;
+  var cropBoxWidth = _ref7.width;
+  var aspectRatio = _ref8.aspectRatio,
+      naturalWidth = _ref8.naturalWidth,
+      naturalHeight = _ref8.naturalHeight,
+      canvasWidth = _ref8.width;
+  var _ref9$fillColor = _ref9.fillColor,
+      fillColor = _ref9$fillColor === undefined ? 'transparent' : _ref9$fillColor,
+      _ref9$imageSmoothingE = _ref9.imageSmoothingEnabled,
+      imageSmoothingEnabled = _ref9$imageSmoothingE === undefined ? true : _ref9$imageSmoothingE,
+      _ref9$imageSmoothingQ = _ref9.imageSmoothingQuality,
+      imageSmoothingQuality = _ref9$imageSmoothingQ === undefined ? 'low' : _ref9$imageSmoothingQ,
+      _ref9$maxWidth = _ref9.maxWidth,
+      maxWidth = _ref9$maxWidth === undefined ? Infinity : _ref9$maxWidth,
+      _ref9$maxHeight = _ref9.maxHeight,
+      maxHeight = _ref9$maxHeight === undefined ? Infinity : _ref9$maxHeight,
+      _ref9$minWidth = _ref9.minWidth,
+      minWidth = _ref9$minWidth === undefined ? 0 : _ref9$minWidth,
+      _ref9$minHeight = _ref9.minHeight,
+      minHeight = _ref9$minHeight === undefined ? 0 : _ref9$minHeight,
+      targetWidth = _ref9.width,
+      sourceIsVector = _ref9.sourceIsVector;
 
   var canvas = document.createElement('canvas');
   var context = canvas.getContext('2d');
@@ -1045,6 +1050,17 @@ function getSourceCanvas(image, _ref6, _ref7, _ref8) {
     width: minWidth,
     height: minHeight
   });
+
+  if (sourceIsVector) {
+    var x = cropBoxWidth / (imageWidth / imageNaturalWidth);
+    // upscale data for best render quality of vector image
+    var ratio = canvasWidth / targetWidth / (naturalWidth / x);
+    naturalWidth = Math.round(naturalWidth / ratio);
+    naturalHeight = Math.round(naturalHeight / ratio);
+    imageNaturalWidth = Math.round(imageNaturalWidth / ratio);
+    imageNaturalHeight = Math.round(imageNaturalHeight / ratio);
+  }
+
   var width = Math.min(maxSizes.width, Math.max(minSizes.width, naturalWidth));
   var height = Math.min(maxSizes.height, Math.max(minSizes.height, naturalHeight));
   var params = [-imageNaturalWidth / 2, -imageNaturalHeight / 2, imageNaturalWidth, imageNaturalHeight];
@@ -3160,7 +3176,7 @@ var methods = {
 
     var canvasData = this.canvasData;
 
-    var source = getSourceCanvas(this.image, this.imageData, canvasData, options);
+    var source = getSourceCanvas(this.image, this.imageData, this.cropBoxData, canvasData, options);
 
     // Returns the source canvas if it is not cropped.
     if (!this.cropped) {
@@ -3172,6 +3188,16 @@ var methods = {
         y = _getData.y,
         initialWidth = _getData.width,
         initialHeight = _getData.height;
+
+    var isVectorSource = true;
+    if (isVectorSource) {
+      // upscale data for best render quality of vector image
+      var ratio = canvasData.width / options.width / (this.image.naturalWidth / initialWidth);
+      x = Math.round(x / ratio);
+      y = Math.round(y / ratio);
+      initialWidth = Math.round(initialWidth / ratio);
+      initialHeight = Math.round(initialHeight / ratio);
+    }
 
     var aspectRatio = initialWidth / initialHeight;
     var maxSizes = getContainSizes({
@@ -3453,6 +3479,7 @@ var Cropper = function () {
         _this.read(xhr.response);
       };
 
+      // Bust cache when there is a "crossOrigin" property
       if (options.checkCrossOrigin && isCrossOriginURL(url) && element.crossOrigin) {
         url = addTimestamp(url);
       }

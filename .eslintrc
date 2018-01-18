@@ -4,6 +4,7 @@
     "browser": true
   },
   "rules": {
+    "linebreak-style": "off",
     "no-param-reassign": "off",
     "no-restricted-properties": "off",
     "valid-jsdoc": ["error", {

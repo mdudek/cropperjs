@@ -790,6 +790,7 @@ Change the crop box position and size with new data.
     - `maxWidth`: the maximum destination width of the output canvas, the default value is `Infinity`.
     - `maxHeight`: the maximum destination height of the output canvas, the default value is `Infinity`.
     - `fillColor`: a color to fill any alpha values in the output canvas, the default value is `transparent`.
+    - `sourceIsVector`: a flag that controls rendering of vector image with small dimensions to the large canvas
     - [`imageSmoothingEnabled`](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/imageSmoothingEnabled): set to change if images are smoothed (`true`, default) or not (`false`).
     - [`imageSmoothingQuality`](https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D/imageSmoothingQuality): set the quality of image smoothing, one of "low" (default), "medium", or "high".
 
