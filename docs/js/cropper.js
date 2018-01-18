@@ -5,7 +5,7 @@
  * Copyright (c) 2015-2018 Chen Fengyuan
  * Released under the MIT license
  *
- * Date: 2018-01-18T14:22:04.062Z
+ * Date: 2018-01-18T15:26:04.264Z
  */
 
 (function (global, factory) {
@@ -3193,8 +3193,7 @@ var methods = {
         initialWidth = _getData.width,
         initialHeight = _getData.height;
 
-    var isVectorSource = true;
-    if (isVectorSource) {
+    if (options.sourceIsVector) {
       // upscale data for best render quality of vector image
       var ratio = canvasData.width / options.width / (this.image.naturalWidth / initialWidth);
       x = Math.round(x / ratio);

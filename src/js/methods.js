@@ -671,8 +671,7 @@ export default {
       height: initialHeight,
     } = this.getData();
 
-    const isVectorSource = true;
-    if (isVectorSource) {
+    if (options.sourceIsVector) {
       // upscale data for best render quality of vector image
       const ratio = (canvasData.width / options.width) /
         (this.image.naturalWidth / initialWidth);
